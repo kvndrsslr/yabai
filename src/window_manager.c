@@ -2098,7 +2098,10 @@ void window_manager_toggle_window_parent(struct space_manager *sm, struct window
     if (node->zoom == node->parent) {
         node->zoom = NULL;
         window_node_flush(node);
-    } else {
+    } else if (node->parent) {
+        node->parent->left->zoom = NULL;
+        node->parent->right->zoom = NULL;
+
         node->zoom = node->parent;
         window_node_flush(node);
     }
