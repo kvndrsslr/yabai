@@ -100,7 +100,7 @@ void border_resize(struct window *window, CGRect frame)
     CGSNewRegionWithRect(&frame, &window->border.region);
     window->border.frame.size = frame.size;
 
-    window->border.path = (CGRect) {{ 0.5f*g_window_manager.border_width, 0.5f*g_window_manager.border_width }, { frame.size.width - g_window_manager.border_width, frame.size.height - g_window_manager.border_width }};
+    window->border.path = (CGRect) {{ g_window_manager.border_width, g_window_manager.border_width }, { frame.size.width - 2.f*g_window_manager.border_width, frame.size.height - 2.f*g_window_manager.border_width }};
     window->border.path_ref = CGPathCreateWithRoundedRect(window->border.path, cgrect_clamp_x_radius(window->border.path, g_window_manager.border_radius), cgrect_clamp_y_radius(window->border.path, g_window_manager.border_radius), NULL);
 
     uint8_t is_ordered_in = false;
@@ -216,7 +216,7 @@ void border_create(struct window *window)
 
     window->border.id_ref = cfarray_of_cfnumbers(&window->border.id, sizeof(uint32_t), 1, kCFNumberSInt32Type);
     window->border.context = SLWindowContextCreate(g_connection, window->border.id, 0);
-    CGContextSetLineWidth(window->border.context, g_window_manager.border_width);
+    CGContextSetLineWidth(window->border.context, 2.f*g_window_manager.border_width);
     CGContextSetRGBStrokeColor(window->border.context,
                                g_window_manager.normal_border_color.r,
                                g_window_manager.normal_border_color.g,
