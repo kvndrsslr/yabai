@@ -4,8 +4,7 @@ extern int csr_get_active_config(uint32_t *config);
 #define CSR_ALLOW_UNRESTRICTED_FS 0x02
 #define CSR_ALLOW_TASK_FOR_PID    0x04
 
-#define SA_SOCKET_PATH_FMT "/tmp/yabai-sa_%s.socket"
-extern char g_sa_socket_file[MAXLEN];
+mach_port_t g_sa_port = 0;
 
 static char osax_base_dir[MAXLEN];
 static char osax_contents_dir[MAXLEN];
@@ -156,7 +155,7 @@ static bool scripting_addition_set_socket_path(void)
     struct passwd *pw = getpwuid(uid);
     if (!pw) return false;
 
-    snprintf(g_sa_socket_file, sizeof(g_sa_socket_file), SA_SOCKET_PATH_FMT, pw->pw_name);
+    /* snprintf(g_sa_socket_file, sizeof(g_sa_socket_file), SA_SOCKET_PATH_FMT, pw->pw_name); */
     return true;
 }
 
@@ -239,33 +238,18 @@ cleanup:
 
 static bool scripting_addition_request_handshake(char *version, uint32_t *attrib)
 {
-    int sockfd;
-    bool result = false;
-    char rsp[BUFSIZ] = {};
     char bytes[0x100] = { 0x01, SA_OPCODE_HANDSHAKE };
+    char* response = mach_send_message(mach_get_bs_port_sa(), bytes, 2, true);
 
-    if (socket_open(&sockfd)) {
-        if (socket_connect(sockfd, g_sa_socket_file)) {
-            if (send(sockfd, bytes, 2, 0) != -1) {
-                int length = recv(sockfd, rsp, sizeof(rsp)-1, 0);
-                if (length <= 0) goto out;
+    if (!response) return false;
+    char *zero = response;
+    while (*zero != '\0') ++zero;
 
-                char *zero = rsp;
-                while (*zero != '\0') ++zero;
+    assert(*zero == '\0');
+    memcpy(version, response, zero - response + 1);
+    memcpy(attrib, zero+1, sizeof(uint32_t));
 
-                assert(*zero == '\0');
-                memcpy(version, rsp, zero - rsp + 1);
-                memcpy(attrib, zero+1, sizeof(uint32_t));
-
-                result = true;
-            }
-        }
-
-out:
-        socket_close(sockfd);
-    }
-
-    return result;
+    return true;
 }
 
 static int scripting_addition_perform_validation(void)
@@ -420,22 +404,11 @@ out:
 
 static bool scripting_addition_send_bytes(char *bytes, int length)
 {
-    int sockfd;
-    char dummy;
-    bool result = false;
+    if (!g_sa_port) g_sa_port = mach_get_bs_port_sa();
 
-    if (socket_open(&sockfd)) {
-        if (socket_connect(sockfd, g_sa_socket_file)) {
-            if (send(sockfd, bytes, length, 0) != -1) {
-                recv(sockfd, &dummy, 1, 0);
-                result = true;
-            }
-        }
-
-        socket_close(sockfd);
-    }
-
-    return result;
+    char* rsp = mach_send_message(g_sa_port, bytes, length, true);
+    if (rsp && *rsp == 'k') return true;
+    return false;
 }
 
 bool scripting_addition_focus_space(uint64_t sid)

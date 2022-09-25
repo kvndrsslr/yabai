@@ -38,6 +38,7 @@
 //#include "misc/autorelease.h"
 #include "misc/notify.h"
 #include "misc/log.h"
+#include "misc/mach.h"
 #include "misc/helpers.h"
 #include "misc/sbuffer.h"
 #define HASHTABLE_IMPLEMENTATION
@@ -65,6 +66,7 @@
 #include "window_manager.h"
 #include "mouse_handler.h"
 
+#include "misc/mach.c"
 #include "sa.m"
 #include "mission_control.c"
 #include "event_loop.c"
