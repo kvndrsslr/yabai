@@ -303,6 +303,7 @@ void window_manager_set_window_border_radius(struct window_manager *wm, int radi
 
 void window_manager_set_active_window_border_color(struct window_manager *wm, uint32_t color)
 {
+    if (wm->active_border_color.p == color) return;
     wm->active_border_color = rgba_color_from_hex(color);
     struct window *window = window_manager_focused_window(wm);
     if (window) border_activate(window);
@@ -310,6 +311,7 @@ void window_manager_set_active_window_border_color(struct window_manager *wm, ui
 
 void window_manager_set_normal_window_border_color(struct window_manager *wm, uint32_t color)
 {
+    if (wm->normal_border_color.p == color) return;
     wm->normal_border_color = rgba_color_from_hex(color);
     for (int window_index = 0; window_index < wm->window.capacity; ++window_index) {
         struct bucket *bucket = wm->window.buckets[window_index];
