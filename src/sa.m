@@ -556,6 +556,28 @@ bool scripting_addition_scale_window(uint32_t wid, float x, float y, float w, fl
     return scripting_addition_send_bytes(bytes, length);
 }
 
+bool scripting_addition_transform_window_list(float alpha, uint32_t* wid, float* x, float* y, float* s_w, float* s_h, uint32_t count)
+{
+    char bytes[count * 4 * 5 + 0x100];
+    uint32_t length = 2;
+
+    pack(bytes, count, length);
+    pack(bytes, alpha, length);
+
+    for (int i = 0; i < count; i++) {
+      pack(bytes, *(wid + i), length);
+      pack(bytes, *(x + i), length);
+      pack(bytes, *(y + i), length);
+      pack(bytes, *(s_w + i), length);
+      pack(bytes, *(s_h + i), length);
+    }
+
+    bytes[1] = 0x10;
+    bytes[0] = 0;
+
+    return scripting_addition_send_bytes(bytes, sizeof(bytes));
+}
+
 bool scripting_addition_swap_window_proxy(uint32_t a_wid, uint32_t b_wid, float opacity, int order)
 {
     char bytes[0x100];

@@ -34,6 +34,7 @@ enum sa_opcode
     SA_OPCODE_WINDOW_SCALE        = 0x0D,
     SA_OPCODE_WINDOW_SWAP_PROXY   = 0x0E,
     SA_OPCODE_WINDOW_ORDER        = 0x0F,
+    SA_OPCODE_WINDOW_TRANSFORM    = 0x10,
 };
 
 #endif

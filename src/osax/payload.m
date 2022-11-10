@@ -74,6 +74,7 @@ extern CGError SLSTransactionCommit(CFTypeRef transaction, int unknown);
 extern CGError SLSTransactionOrderWindow(CFTypeRef transaction, uint32_t wid, int order, uint32_t rel_wid);
 extern CGError SLSTransactionSetWindowAlpha(CFTypeRef transaction, uint32_t wid, float alpha);
 extern CGError SLSTransactionSetWindowSystemAlpha(CFTypeRef transaction, uint32_t wid, float alpha);
+extern CGError SLSTransactionSetWindowTransform(CFTypeRef transaction, uint32_t wid, int unknown, int unknown2, CGAffineTransform t);
 
 struct window_fade_context
 {
@@ -592,6 +593,37 @@ static void do_space_focus(char *message)
     }
 }
 
+static void do_window_transform(char *message)
+{
+    uint32_t count = 0;
+    unpack(message, count);
+    if (!count) return;
+
+    float alpha = 1.f;
+    unpack(message, alpha);
+
+    CFTypeRef transaction = SLSTransactionCreate(CGSMainConnectionID());
+    for (int i = 0; i < count; i++) {
+      uint32_t wid = 0;
+      unpack(message, wid);
+      float x, y, s_w, s_h;
+      unpack(message, x);
+      unpack(message, y);
+      unpack(message, s_w);
+      unpack(message, s_h);
+
+      if (!wid) continue;
+
+      CGAffineTransform transform = CGAffineTransformMakeTranslation(-x, -y);
+      CGAffineTransform scale = CGAffineTransformMakeScale(s_w, s_h);
+
+      SLSTransactionSetWindowTransform(transaction, wid, 0, 0, CGAffineTransformConcat(transform, scale));
+      SLSTransactionSetWindowSystemAlpha(transaction, wid, alpha);
+    }
+    SLSTransactionCommit(transaction, 1);
+    CFRelease(transaction);
+}
+
 static void do_window_scale(char *message)
 {
     uint32_t wid;
@@ -828,7 +860,7 @@ static void do_window_swap_proxy(char *message)
     CFTypeRef transaction = SLSTransactionCreate(CGSMainConnectionID());
     SLSTransactionOrderWindow(transaction, b_wid, order, a_wid);
     SLSTransactionSetWindowSystemAlpha(transaction, a_wid, alpha);
-    SLSTransactionCommit(transaction, 0);
+    SLSTransactionCommit(transaction, 1);
     CFRelease(transaction);
 }
 
@@ -1056,6 +1088,9 @@ static void handle_message(struct mach_buffer* buffer)
     } break;
     case SA_OPCODE_WINDOW_ORDER: {
         do_window_order(message);
+    } break;
+    case SA_OPCODE_WINDOW_TRANSFORM: {
+        do_window_transform(message);
     } break;
     }
     mach_send_message(buffer->message.header.msgh_remote_port, "k", 2);

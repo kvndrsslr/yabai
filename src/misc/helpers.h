@@ -40,7 +40,13 @@ static inline float get_seconds_elapsed(uint64_t start, uint64_t end)
 
 static inline float ease_out_cubic(float t)
 {
-    return 1.0f - powf(1.0f - t, 3.0f);
+    // float c1 = 1.70158;
+    // float c3 = 2.70158;
+    // return 1.f + c3 * powf(t - 1.f, 3.f) + c1 * powf(t - 1.f, 2.f);
+  
+    // return 1.0f - powf(1.0f - t, 3.0f);
+    // return t == 1.f ? 1.f : 1.f - powf(2.f, -10.f * t);
+    return sqrt(1.f - powf(t - 1.f, 2.f));
 }
 
 #define ANIMATE_DELAY(current_frame_duration)                                                    \
