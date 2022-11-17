@@ -486,6 +486,10 @@ static EVENT_HANDLER(WINDOW_DESTROYED)
     border_destroy(window);
 
     struct view *view = window_manager_find_managed_window(&g_window_manager, window);
+    struct window *next_window = window_manager_find_natural_next_window(&g_space_manager, &g_window_manager, window);
+
+    if (next_window) window_manager_focus_window_with_raise(&next_window->application->psn, next_window->id, next_window->ref);
+
     if (view) {
         space_manager_untile_window(&g_space_manager, view, window);
         window_manager_remove_managed_window(&g_window_manager, window->id);

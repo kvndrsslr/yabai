@@ -1003,6 +1003,28 @@ struct window *window_manager_find_last_managed_window(struct space_manager *sm,
     return window_manager_find_window(wm, last->window_order[0]);
 }
 
+struct window *window_manager_find_natural_next_window(struct space_manager *sm, struct window_manager *wm, struct window* window)
+{
+    struct view *view = space_manager_find_view(sm, space_manager_active_space());
+    if (!view) return NULL;
+
+    struct window_node *node = view_find_window_node(view, window->id);
+    if (!node) return NULL;
+
+    struct window_node *next = NULL;
+    if (window_node_is_left_child(node)) {
+      next = node->parent->right;
+    } else if (window_node_is_right_child(node)) {
+      next = node->parent->left;
+    } else {
+      return window_manager_find_next_managed_window(sm, wm, window);
+    }
+
+    if (!next) return NULL;
+
+    return window_manager_find_window(wm, next->window_order[0]);
+}
+
 struct window *window_manager_find_recent_managed_window(struct space_manager *sm, struct window_manager *wm)
 {
     struct window *window = window_manager_find_window(wm, wm->last_window_id);
