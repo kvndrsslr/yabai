@@ -158,7 +158,6 @@ static inline bool configure_settings_and_acquire_lock(void)
     g_normal_window_level   = CGWindowLevelForKey(LAYER_NORMAL);
     g_floating_window_level = CGWindowLevelForKey(LAYER_ABOVE);
 
-    NSApplicationLoad();
     signal(SIGCHLD, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     CGSetLocalEventsSuppressionInterval(0.0f);
@@ -300,6 +299,7 @@ static void parse_arguments(int argc, char **argv)
     }
 }
 
+extern int RunApplicationEventLoop(void);
 int main(int argc, char **argv)
 {
     if (argc > 1) {
@@ -379,13 +379,6 @@ int main(int argc, char **argv)
 
     exec_config_file();
 
-    for (;;) {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        CFRunLoopRunResult result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, 300, true);
-        [pool drain];
-
-        if (result == kCFRunLoopRunFinished || result == kCFRunLoopRunStopped) break;
-    }
-
+    RunApplicationEventLoop();
     return 0;
 }
