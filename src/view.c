@@ -11,7 +11,7 @@ void insert_feedback_show(struct window_node *node)
     CGSNewRegionWithRect(&frame, &frame_region);
 
     if (!node->feedback_window.id) {
-        uint64_t tag = 1ULL << 46;
+        uint64_t tag = 1ULL << 1;
         SLSNewWindow(g_connection, 2, 0, 0, frame_region, &node->feedback_window.id);
         SLSSetWindowTags(g_connection, node->feedback_window.id, &tag, 64);
         sls_window_disable_shadow(node->feedback_window.id);

@@ -202,7 +202,7 @@ void border_create(struct window *window)
     CGRect frame = CGRectNull;
     CGSNewRegionWithRect(&frame, &window->border.region);
 
-    uint64_t tag = 1ULL << 46;
+    uint64_t tag = 1ULL << 1;
     SLSNewWindow(g_connection, 2, 0, 0, window->border.region, &window->border.id);
     SLSSetWindowTags(g_connection, window->border.id, &tag, 64);
     sls_window_disable_shadow(window->border.id);

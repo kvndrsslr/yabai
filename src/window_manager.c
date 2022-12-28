@@ -535,7 +535,7 @@ static void window_manager_create_window_proxy(int animation_connection, struct 
     CGSNewRegionWithRect(&proxy->frame, &frame_region);
     SLSNewWindow(animation_connection, 2, 0, 0, frame_region, &proxy->id);
 
-    uint64_t tag = 1ULL << 46;
+    uint64_t tag = 1ULL << 1;
     SLSSetWindowTags(animation_connection, proxy->id, &tag, 64);
 
     sls_window_disable_shadow(proxy->id);

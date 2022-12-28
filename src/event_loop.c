@@ -1260,13 +1260,6 @@ static EVENT_HANDLER(MISSION_CONTROL_SHOW_ALL_WINDOWS)
     debug("%s:\n", __FUNCTION__);
     g_mission_control_active = 2;
 
-    border_hide_all();
-
-    for (int i = 0; i < buf_len(g_window_manager.insert_feedback_windows); ++i) {
-        uint32_t feedback_wid = g_window_manager.insert_feedback_windows[i];
-        SLSOrderWindow(g_connection, feedback_wid, 0, 0);
-    }
-
     event_signal_push(SIGNAL_MISSION_CONTROL_ENTER, NULL);
 }
 
@@ -1274,13 +1267,6 @@ static EVENT_HANDLER(MISSION_CONTROL_SHOW_FRONT_WINDOWS)
 {
     debug("%s:\n", __FUNCTION__);
     g_mission_control_active = 3;
-
-    border_hide_all();
-
-    for (int i = 0; i < buf_len(g_window_manager.insert_feedback_windows); ++i) {
-        uint32_t feedback_wid = g_window_manager.insert_feedback_windows[i];
-        SLSOrderWindow(g_connection, feedback_wid, 0, 0);
-    }
 
     event_signal_push(SIGNAL_MISSION_CONTROL_ENTER, NULL);
 }
@@ -1290,13 +1276,6 @@ static EVENT_HANDLER(MISSION_CONTROL_SHOW_DESKTOP)
     debug("%s:\n", __FUNCTION__);
     g_mission_control_active = 4;
 
-    border_hide_all();
-
-    for (int i = 0; i < buf_len(g_window_manager.insert_feedback_windows); ++i) {
-        uint32_t feedback_wid = g_window_manager.insert_feedback_windows[i];
-        SLSOrderWindow(g_connection, feedback_wid, 0, 0);
-    }
-
     event_signal_push(SIGNAL_MISSION_CONTROL_ENTER, NULL);
 }
 
@@ -1304,13 +1283,6 @@ static EVENT_HANDLER(MISSION_CONTROL_ENTER)
 {
     debug("%s:\n", __FUNCTION__);
     g_mission_control_active = 1;
-
-    border_hide_all();
-
-    for (int i = 0; i < buf_len(g_window_manager.insert_feedback_windows); ++i) {
-        uint32_t feedback_wid = g_window_manager.insert_feedback_windows[i];
-        SLSOrderWindow(g_connection, feedback_wid, 0, 0);
-    }
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1f * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         event_loop_post(&g_event_loop, MISSION_CONTROL_CHECK_FOR_EXIT, NULL, 0);
@@ -1365,13 +1337,6 @@ static EVENT_HANDLER(MISSION_CONTROL_CHECK_FOR_EXIT)
 static EVENT_HANDLER(MISSION_CONTROL_EXIT)
 {
     debug("%s:\n", __FUNCTION__);
-
-    border_show_all();
-
-    for (int i = 0; i < buf_len(g_window_manager.insert_feedback_windows); ++i) {
-        uint32_t feedback_wid = g_window_manager.insert_feedback_windows[i];
-        SLSOrderWindow(g_connection, feedback_wid, 1, 0);
-    }
 
     if (!workspace_is_macos_ventura() && !workspace_is_macos_sonoma()) {
         if (g_mission_control_active == 1 || g_mission_control_active == 2) {
