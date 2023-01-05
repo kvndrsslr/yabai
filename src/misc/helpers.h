@@ -76,10 +76,10 @@ static inline float ease_out_cubic(float t)
         CFRelease(transaction);                                                                  \
                                                                                                  \
         float frame_elapsed = get_seconds_elapsed(last_counter, get_wall_clock());               \
+        int frame_skip = (int)((frame_elapsed / frame_duration));                                \
         if (frame_elapsed < frame_duration) {                                                    \
             ANIMATE_DELAY(frame_duration);                                                       \
-        } else {                                                                                 \
-            int frame_skip = (int)((frame_elapsed / frame_duration) + 0.5f);                     \
+        } else if (frame_skip == 1) {                                                            \
             frame_index += frame_skip;                                                           \
             ANIMATE_DELAY(frame_duration * frame_skip);                                          \
         }                                                                                        \
