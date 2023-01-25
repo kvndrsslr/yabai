@@ -2414,8 +2414,8 @@ void window_manager_init(struct window_manager *wm)
     wm->normal_border_color = rgba_color_from_hex(0xff555555);
     wm->border_resolution = 2.0f;
     wm->border_blur = true;
-    wm->border_width = 4;
-    wm->border_radius = 9;
+    wm->border_width = 2;
+    wm->border_radius = 0;
 
     table_init(&wm->application, 150, hash_wm, compare_wm);
     table_init(&wm->window, 150, hash_wm, compare_wm);
