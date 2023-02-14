@@ -685,7 +685,12 @@ void window_manager_animate_window_list_async(struct window_capture *window_list
             context->animation_list[i].proxy.frame.size.width  = (int)(existing_animation->proxy.tw);
             context->animation_list[i].proxy.frame.size.height = (int)(existing_animation->proxy.th);
             context->animation_list[i].proxy.level             = existing_animation->proxy.level;
-            context->animation_list[i].proxy.image             = CFRetain(existing_animation->proxy.image);
+            if (!existing_animation->proxy.image) {
+              context->animation_list[i].proxy.image = SLSHWCaptureWindowList(context->animation_connection, &context->animation_list[i].wid, 1, (1 << 11) | (1 << 8));
+            } else {
+              context->animation_list[i].proxy.image             = CFRetain(existing_animation->proxy.image);
+            }
+
             __asm__ __volatile__ ("" ::: "memory");
 
             window_manager_create_window_proxy(context->animation_connection, &context->animation_list[i].proxy);
